@@ -12,7 +12,7 @@ class GetUser extends Command
      *
      * @var string
      */
-    protected $signature = 'getUser {userId}';
+    protected $signature = 'getUser';
 
     /**
      * The console command description.
@@ -26,11 +26,35 @@ class GetUser extends Command
      */
     public function handle()
     {
-        $userId = $this->argument('userId');
+        $users = UserModel::with('userPassword')->get();
+        
+        $this->info($users);
+        if (!$users) {
+            $this->error("Users dont exist");
+            return;
+        }
 
-        $user = UserModel::with('userPassword')->where('id',$userId)->get();
-        //
-        $this->info($user);
+        foreach ($users as $user) {
+            $this->info("User ID: " . $user->id);
+            $this->info("Name: " . $user->name);
+            $this->info("Profile Photo: " . $user->profilePic);
+            $this->info("Address: " . $user->address);
+            $this->info("Phone No: " . $user->phone);
+
+            if ($user->userPassword && count($user->userPassword) > 0) {
+                $this->info("
+Passwords:");
+                foreach ($user->userPassword as $password) {
+                    $this->info("- $password->platform: " . $password->password);
+                }
+            } else {
+                $this->info("Passwords: Not available");
+            }
+
+            $this->info("Created At: " . $user->created_at);
+            $this->info("Updated At: " . $user->updated_at);
+            $this->info("--------------------"); // Divider for clarity
+        }
 
     }
 }
