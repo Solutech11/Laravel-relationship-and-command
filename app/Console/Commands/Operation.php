@@ -27,6 +27,19 @@ class Operation extends Command
      */
     public function handle()
     {
+
+        //get user
+        $alluser= UserModel::all();
+
+        if($alluser){
+            $this->line('---------------------------------');
+            foreach ($alluser as $user) {
+                $this->info("id: {$user->id}, name: {$user->name}");
+            }
+            $this->line('---------------------------------
+            ');
+
+        }
         //
         $this->info("Select the command
 - Select
@@ -88,10 +101,16 @@ class Operation extends Command
 
         if ($user) {
             $newName = $this->ask('Enter the new name');
-            $user->name = $newName;
+            $user->name = $newName?$newName:$user->name;
 
             $newAdress = $this->ask('Enter the new Address');
             $user->address = $newAdress?$newAdress:$user->address;
+
+            $newPhone = $this->ask('Enter the new Phone number');
+            $user->phone = $newPhone?$newPhone:$user->phone;
+
+            $newpassword = $this->ask('Enter the new password');
+            $user->password = $newpassword?Hash::make($newpassword):$user->password;
 
             $user->save();
             $this->info('User updated successfully.');
